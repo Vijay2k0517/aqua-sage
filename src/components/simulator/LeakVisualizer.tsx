@@ -3,7 +3,7 @@
 import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { Html } from '@react-three/drei';
+import { Billboard, Text } from '@react-three/drei';
 import { useSimulation } from '@/lib/simulator/SimulationContext';
 import { useSelection } from './interaction/SelectionProvider';
 import { InteractiveWrapper } from './interaction/InteractiveWrapper';
@@ -195,23 +195,34 @@ export function LeakVisualizer({
             </group>
           )}
 
-          {/* 3D Diegetic HUD Failure Badge */}
+          {/* 3D Diegetic HUD Failure Badge (Zero DOM createRoot) */}
           {isLeaking && (
-            <Html position={[0, 0.28, 0]} center distanceFactor={5.5}>
-              <div
+            <Billboard position={[0, 0.28, 0]} follow={true}>
+              <group
                 onClick={(e) => {
                   e.stopPropagation();
-                  selectComponent('pipe-leak');
+                  selectComponent('pipe-leak-bay');
                 }}
-                className="cursor-pointer px-2.5 py-1 rounded-md border border-rose-500 bg-rose-950/95 backdrop-blur-md shadow-2xl shadow-rose-950/80 flex items-center gap-2 text-white font-mono text-[10px] animate-bounce"
               >
-                <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-                <span className="font-bold tracking-wider">RUPTURE LEAK</span>
-                <span className="text-rose-300 font-bold tabular-nums">
-                  -{leakSeverity.toFixed(1)} L/m
-                </span>
-              </div>
-            </Html>
+                <mesh position={[0, 0, 0]}>
+                  <planeGeometry args={[0.22, 0.04]} />
+                  <meshBasicMaterial color="#991B1B" transparent opacity={0.92} />
+                </mesh>
+                <mesh position={[-0.095, 0, 0.002]}>
+                  <circleGeometry args={[0.005, 16]} />
+                  <meshBasicMaterial color="#EF4444" />
+                </mesh>
+                <Text
+                  position={[0.012, 0, 0.003]}
+                  fontSize={0.016}
+                  color="#FFFFFF"
+                  anchorX="center"
+                  anchorY="middle"
+                >
+                  {`RUPTURE LEAK: -${leakSeverity.toFixed(1)} L/m`}
+                </Text>
+              </group>
+            </Billboard>
           )}
         </group>
       </InteractiveWrapper>

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Billboard, Text } from '@react-three/drei';
-import * as THREE from 'three';
 import { ReadinessTier } from '@/lib/simulator/types';
 import { InteractiveWrapper } from './interaction/InteractiveWrapper';
 import { useSelection } from './interaction/SelectionProvider';

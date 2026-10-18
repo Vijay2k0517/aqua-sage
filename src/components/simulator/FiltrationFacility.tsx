@@ -1,11 +1,9 @@
 'use client';
 
-import React from 'react';
-import { Html } from '@react-three/drei';
+import { Billboard, Text } from '@react-three/drei';
 import { useSimulation } from '@/lib/simulator/SimulationContext';
 import { useSelection } from './interaction/SelectionProvider';
 import { InteractiveWrapper } from './interaction/InteractiveWrapper';
-import { Filter } from 'lucide-react';
 
 /**
  * Compact Prototype Filtration Unit
@@ -81,24 +79,37 @@ export function FiltrationFacility() {
             />
           </mesh>
 
-          {/* HUD Badge */}
-          <Html position={[0, canisterHeight / 2 + 0.12, 0]} center distanceFactor={4.5}>
-            <button
+          {/* 3D WebGL Billboard HUD Badge (Zero DOM createRoot) */}
+          <Billboard position={[0, canisterHeight / 2 + 0.12, 0]} follow={true}>
+            <group
               onClick={(e) => {
                 e.stopPropagation();
                 selectComponent('flt-stage1');
               }}
-              className={`px-2 py-0.5 rounded text-[10px] font-mono border backdrop-blur-md flex items-center gap-1.5 transition-all shadow-lg select-none cursor-pointer ${
-                isDiverting
-                  ? 'bg-cyan-950/90 border-cyan-400 text-cyan-200 animate-pulse font-bold'
-                  : 'bg-slate-900/90 border-slate-700 text-slate-400 hover:text-slate-200'
-              }`}
-              title="Filtration Unit [Simulated Mechanism - Planned Hardware]"
             >
-              <Filter className="w-3 h-3 text-cyan-400" />
-              <span>FILTRATION [{isDiverting ? 'ACTIVE' : 'STANDBY'}]</span>
-            </button>
-          </Html>
+              <mesh position={[0, 0, 0]}>
+                <planeGeometry args={[0.22, 0.038]} />
+                <meshBasicMaterial
+                  color={isDiverting ? '#0E7490' : '#0F172A'}
+                  transparent
+                  opacity={0.92}
+                />
+              </mesh>
+              <mesh position={[-0.095, 0, 0.002]}>
+                <circleGeometry args={[0.005, 16]} />
+                <meshBasicMaterial color={isDiverting ? '#22D3EE' : '#64748B'} />
+              </mesh>
+              <Text
+                position={[0.012, 0, 0.003]}
+                fontSize={0.015}
+                color="#FFFFFF"
+                anchorX="center"
+                anchorY="middle"
+              >
+                {`FILTRATION [${isDiverting ? 'ACTIVE' : 'STANDBY'}]`}
+              </Text>
+            </group>
+          </Billboard>
         </group>
       </InteractiveWrapper>
 

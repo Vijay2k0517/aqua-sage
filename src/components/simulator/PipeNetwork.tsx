@@ -5,6 +5,7 @@ import { Valve } from './Valve';
 import { SensorPlaceholder } from './SensorPlaceholder';
 import { InteractiveWrapper } from './interaction/InteractiveWrapper';
 import { useSimulation } from '@/lib/simulator/SimulationContext';
+import { useSelection } from './interaction/SelectionProvider';
 import { Billboard, Text } from '@react-three/drei';
 
 export type DiagnosticMode = 'pbr' | 'pressure' | 'xray';
@@ -281,10 +282,10 @@ export function PipeNetwork({ diagnosticMode = 'pbr' }: PipeNetworkProps) {
             />
           </mesh>
 
-          {/* 3D Interactive HUD Tag */}
+          {/* 3D WebGL Billboard HUD Tag (Zero DOM createRoot) */}
           {selectedComponentId !== 'pipe-leak-bay' && (
-            <Html position={[0, 0.08, 0]} center distanceFactor={8}>
-              <button
+            <Billboard position={[0, 0.08, 0]} follow={true}>
+              <group
                 onClick={(e) => {
                   e.stopPropagation();
                   selectComponent('pipe-leak-bay');
@@ -294,26 +295,32 @@ export function PipeNetwork({ diagnosticMode = 'pbr' }: PipeNetworkProps) {
                     injectLeak(5.5, 0.5);
                   }
                 }}
-                className={`px-2 py-0.5 rounded text-[10px] font-mono whitespace-nowrap border backdrop-blur-md flex items-center gap-1.5 transition-all shadow-lg select-none cursor-pointer ${
-                  isLeaking
-                    ? 'bg-rose-950/90 border-rose-500 text-rose-200 animate-pulse font-bold'
-                    : 'bg-slate-900/90 border-slate-700 hover:border-cyan-400 text-slate-300'
-                }`}
-                title="Click to introduce or clear simulated pipe leak"
               >
-                {isLeaking ? (
-                  <>
-                    <AlertTriangle className="w-3 h-3 text-rose-400 shrink-0" />
-                    <span>LEAK: {state.leakSeverityLpm?.toFixed(1)} L/m</span>
-                  </>
-                ) : (
-                  <>
-                    <Droplet className="w-3 h-3 text-cyan-400 shrink-0" />
-                    <span>LEAK BAY (Click to Test)</span>
-                  </>
-                )}
-              </button>
-            </Html>
+                <mesh position={[0, 0, 0]}>
+                  <planeGeometry args={[isLeaking ? 0.22 : 0.16, 0.038]} />
+                  <meshBasicMaterial
+                    color={isLeaking ? '#991B1B' : '#0F172A'}
+                    transparent
+                    opacity={0.92}
+                  />
+                </mesh>
+                <mesh position={[isLeaking ? -0.095 : -0.065, 0, 0.002]}>
+                  <circleGeometry args={[0.005, 16]} />
+                  <meshBasicMaterial color={isLeaking ? '#EF4444' : '#38BDF8'} />
+                </mesh>
+                <Text
+                  position={[0.01, 0, 0.003]}
+                  fontSize={0.016}
+                  color="#FFFFFF"
+                  anchorX="center"
+                  anchorY="middle"
+                >
+                  {isLeaking
+                    ? `LEAK: ${state.leakSeverityLpm?.toFixed(1)} L/m`
+                    : 'LEAK BAY (Click to Test)'}
+                </Text>
+              </group>
+            </Billboard>
           )}
         </group>
       </InteractiveWrapper>

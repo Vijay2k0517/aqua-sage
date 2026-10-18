@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { Html } from '@react-three/drei';
+import { Billboard, Text } from '@react-three/drei';
 import { InteractiveWrapper } from './interaction/InteractiveWrapper';
 import { useSelection } from './interaction/SelectionProvider';
 
@@ -137,41 +136,37 @@ export function ControllerEnclosure() {
           </group>
         ))}
 
-        {/* High-Contrast Interactive Exterior HUD Label */}
-        <Html position={[0, boxHeight / 2 + 0.05, boxDepth / 2]} center distanceFactor={4.5} zIndexRange={[100, 0]}>
-          <button
+        {/* High-Contrast Interactive Exterior 3D Billboard HUD Label (Zero DOM createRoot) */}
+        <Billboard position={[0, boxHeight / 2 + 0.05, boxDepth / 2]} follow={true}>
+          <group
             onClick={(e) => {
               e.stopPropagation();
               selectComponent(id);
             }}
-            className={`cursor-pointer select-none flex flex-col items-center transition-all duration-200 ${
-              isSelected ? 'scale-110' : isHovered ? 'scale-105' : 'scale-100 opacity-90 hover:opacity-100'
-            }`}
           >
-            <div
-              className={`px-2 py-0.5 rounded shadow-xl border backdrop-blur-md flex items-center gap-1.5 whitespace-nowrap transition-all ${
-                isSelected
-                  ? 'bg-emerald-950/95 border-emerald-400 ring-2 ring-emerald-400/40 text-white'
-                  : isHovered
-                  ? 'bg-slate-900/95 border-emerald-400/70 text-emerald-200'
-                  : 'bg-slate-950/90 border-emerald-500/50 text-emerald-200'
-              }`}
+            <mesh position={[0, 0, 0]}>
+              <planeGeometry args={[0.22, 0.038]} />
+              <meshBasicMaterial
+                color={isSelected ? '#065F46' : isHovered ? '#064E3B' : '#022C22'}
+                transparent
+                opacity={0.92}
+              />
+            </mesh>
+            <mesh position={[-0.095, 0, 0.002]}>
+              <circleGeometry args={[0.005, 16]} />
+              <meshBasicMaterial color="#10B981" />
+            </mesh>
+            <Text
+              position={[0.012, 0, 0.003]}
+              fontSize={0.015}
+              color="#FFFFFF"
+              anchorX="center"
+              anchorY="middle"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-mono text-[10px] font-bold text-white tracking-tight">
-                ESP32-WROOM-32
-              </span>
-              <span className="text-[8px] uppercase tracking-wider px-1 py-0.2 bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/30 font-sans">
-                Gateway
-              </span>
-            </div>
-            <div
-              className={`w-0.5 h-2 transition-colors ${
-                isSelected ? 'bg-emerald-400 h-2.5' : isHovered ? 'bg-emerald-400/80' : 'bg-emerald-500/50'
-              }`}
-            />
-          </button>
-        </Html>
+              ESP32-WROOM-32 Gateway
+            </Text>
+          </group>
+        </Billboard>
       </group>
     </InteractiveWrapper>
   );
